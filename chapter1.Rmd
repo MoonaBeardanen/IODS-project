@@ -9,5 +9,5 @@
 date()
 
 ```
-The text continues here.
+This is a course work to practise the use of R and Gitub in sharing data and for research. This version is updated by a person that has never used R or Git so this should be amusing to watch. 
 
