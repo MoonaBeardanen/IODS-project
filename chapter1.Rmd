@@ -1,4 +1,6 @@
 
 # About the project
 
-This is a course work to practise the use of R and Gitub in sharing data and for research. This version is updated by a person that has never used R or Git so this should be amusing to watch. 
+This is a course work to practice the use of R and GitHub in sharing data and for research. This version is updated by a person that has never used R or Git so this should be amusing to watch. I'm alrwady overwhelmed and exhausted of this work but lets see how far will I get. 
+
+Link to my GitHub repository: https://github.com/Moonabeardanen/IODS-project
