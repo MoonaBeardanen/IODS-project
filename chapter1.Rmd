@@ -7,7 +7,6 @@ Link to my GitHub repository: https://github.com/Moonabeardanen/IODS-project
 
 
 # 1: Start me up!
-
 ## R for health data science book
 
 ### The exercise set 1
