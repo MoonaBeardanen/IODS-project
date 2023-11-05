@@ -4,3 +4,12 @@
 This is a course work to practice the use of R and GitHub in sharing data and for research. This version is updated by a person that has never used R or Git so this should be amusing to watch. I'm alrwady overwhelmed and exhausted of this work but lets see how far will I get. 
 
 Link to my GitHub repository: https://github.com/Moonabeardanen/IODS-project
+
+
+# 1: Start me up!
+
+## R for health data science book
+
+### The exercise set 1
+
+The first chapters were very introductory, but helpful. I will try out those functions soon.
