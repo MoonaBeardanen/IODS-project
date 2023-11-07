@@ -1,14 +1,23 @@
 ---
 title: "IODS course project"
 author: "Moona Partanen"
+date: "`r Sys.Date()`"
+
+# output:
+#   html_document:
+#     theme: cosmo
+#     toc: true
+#     toc_depth: 2
+#     fig_caption: true
+#     fig_width: 6
+#     fig_height: 4
 output:
-  html_document:
-    theme: cosmo
-    toc: true
-    toc_depth: 2
-    fig_caption: true
-    fig_width: 6
-    fig_height: 4
+  rmdformats::readthedown:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
 ---
 
 ***
