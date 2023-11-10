@@ -1,4 +1,4 @@
-# Insert chapter 2 title here
+# Simple regression and model validation
 
 *Describe the work you have done this week and summarize your learning.*
 
@@ -6,11 +6,40 @@
 - Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.
 - Assume the reader has no previous knowledge of your data or the more advanced methods you are using.
 
+First we observe the data characteristics:
+
 ```{r  fig.width=5, fig.height=4, message=FALSE, warning=FALSE}
-date()
-library(tidyverse)
+
+The_data <- read.csv("data/Final_data.csv")
+str(The_data)
+
+```
+We have here 166 different observations with 7 variables. Gender and gender are demographical data from the participants of the test. Deep, stra and surf are numerical values which are derived through means of values of single questions. Attitude is scaled to fit the same Likert scale than deep, stra and surf questions. Points describes the number of points this individual received from the test. 
+
+Lets now investigate the characteristics of the data in form of plots:
+
+```{r echo=TRUE, fig.height=4, fig.width=5, message=FALSE, warning=FALSE}
+
+library(ggplot2)
+
+# plotted data and aesthetics
+ggplot(The_data, aes(x = attitude, y=points, col= gender))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  ggtitle("points by gender in relation to attitude")
+
+ggplot(The_data, aes(x = age, y=attitude, col= gender))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  ggtitle("Attitude by gender in relation to age")
+
+ggplot(The_data, aes(x = age, y = points, col = gender))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  ggtitle("Points by gender in relation to age")
 
 
 ```
+In the first figure you can see that in both male and female the points increase as the attitude rises. This effect however, is is stronger in males. In the second figure the attitude of males is slightly higher than in females in younger respondents. However, as we get closer to the 50 years of age, the number of observations decrease and the separation is not so clear anymore. Majority of the respondents are 20-35 years old. In the third figure you can see that the points of older men are clearly lower than younger men. This however is not observed with females. 
 
 Here we go again...
