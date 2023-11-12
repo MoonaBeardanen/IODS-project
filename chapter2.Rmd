@@ -1,10 +1,8 @@
 # Simple regression and model validation
 
-*Describe the work you have done this week and summarize your learning.*
+## Data characteristics
 
-- Describe your work and results clearly. 
-- Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.
-- Assume the reader has no previous knowledge of your data or the more advanced methods you are using.
+
 
 First we observe the data characteristics:
 
@@ -19,32 +17,37 @@ We have here 166 different observations with 7 variables. Gender and gender are 
 
 Lets now investigate the characteristics of the data in form of plots:
 
-```{r echo=TRUE, fig.height=3, fig.width=4, message=FALSE, warning=FALSE}
+```{r echo=TRUE, fig.height=6, fig.width=8, message=FALSE, warning=FALSE}
 
 library(ggplot2)
 
-# plotted data and aesthetics
-ggplot(The_data, aes(x = attitude, y=points, col= gender))+
+# plotted data
+p1 <- ggplot(The_data, aes(x = attitude, y=points, col= gender))+
   geom_point()+
   geom_smooth(method = "lm")+
   ggtitle("points by gender in relation to attitude")
 
-ggplot(The_data, aes(x = age, y=attitude, col= gender))+
+p2 <- ggplot(The_data, aes(x = age, y=attitude, col= gender))+
   geom_point()+
   geom_smooth(method = "lm")+
   ggtitle("Attitude by gender in relation to age")
 
-ggplot(The_data, aes(x = age, y = points, col = gender))+
+p3 <- ggplot(The_data, aes(x = age, y = points, col = gender))+
   geom_point()+
   geom_smooth(method = "lm")+
   ggtitle("Points by gender in relation to age")
 
+# Arrangements of the plots
+ggpubr::ggarrange(
+  plotlist = list(p1, p2, p3), labels = "AUTO",
+  common.legend = T)
 
 ```
 
 
-In the first figure you can see that in both male and female the points increase as the attitude rises. This effect however, is is stronger in males. In the second figure the attitude of males is slightly higher than in females in younger respondents. However, as we get closer to the 50 years of age, the number of observations decrease and the separation is not so clear anymore. Majority of the respondents are 20-35 years old. In the third figure you can see that the points of older men are clearly lower than younger men. This however is not observed with females. 
+In the figure A you can see that in both male and female the points increase as the attitude rises. This effect however, is is stronger in males. In the figure B the attitude of males is slightly higher than in females in younger respondents. However, as we get closer to the 50 years of age, the number of observations decrease and the separation is not so clear anymore. Majority of the respondents are 20-35 years old. In the figure C you can see that the points of older men are clearly lower than younger men. This however is not observed with females. 
 
+## Regression model
 
 Then the regression model of the data:
 
@@ -55,10 +58,25 @@ library(ggplot2)
 
 my_model <- lm(points ~ attitude + deep + stra + surf, data = The_data)
 summary(my_model)
+
 ```
+Based on the coefficients, the deep, stra and surf values does not statistically significantly predict the increase or decrease of the points in the test. However, attitude can predict the increase on test points (if none of the other variables are changed), as the p-value of the test is 1.34e-08. According to the model, one unit increase in attitude predict a 3.5 +/- 0.6 points better outcome than the latter attitude unit. However, as the residuals between the real value and the predicted value are quite high (maximum of 11.6, minimum of - 16.7 and a median of 0.79) the result should be interpreted within certain limits. This is further showed with a the R-squared value, which indeed is quite big (0.21). 
 
+Let's observe this test data with figures. However, to make this more clear let's make a new model where the deep, stra and surf variables are removed since the attitude data was the only significant variable in the model.
 
-Interpretation of the data...
+```{r echo=TRUE, fig.height=3, fig.width=4, message=FALSE, warning=FALSE}
+# simpler model
+my_model1 <- lm(points ~ attitude, data = The_data)
+
+#the residuals vs. fitted values, normal QQ, and residuals vs leverage plots
+par(mar = c(4, 4, .1, .1))
+plot(my_model1, which = c(1,2,5))
+
+```
+The linear model assumes linearity and a normally distributed residual. The model seems to meet the normality assumption, evident from the QQ-plot. Additionally, there's consistent variance in errors, shown in the residual plot, and no points significantly impacting the model. In conclusion, the model effectively describes the relationship between the points and attitude.
+
+That's all folks!
+
 
 
 
