@@ -1,0 +1,153 @@
+---
+title: "Chapter3"
+output: html_document
+date: "2023-11-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Logistic regression
+
+## data observations
+
+
+For this weeks work, lets observe the data provided for us regarding student alcohol consumption. 
+
+```{r  fig.width=5, fig.height=4, message=FALSE, warning=FALSE}
+
+alc <- read.csv("alc.csv")
+
+library(dplyr)
+glimpse(alc)
+
+```
+The data consists of 370 observations and 36 columns. The data is a combination of two questionnaires from Portuguese secondary education. The data consists of binary/five-level answers. G1 is the first period grade, the G2 is the second period and the G3 is the final period grade (which is highly dependent of G1 and G2). The other column names corresponds to the variables asked from the students relating to their demographic and social and school related attributes.
+
+Lets then perform some hypotheses of the correlation of alcohol use to other characteristics:
+
+Students that goes out with friends a lot have higher alcohol consumption (variable "goout" numeric: from 1 - very low to 5 -very high)
+Students that have good quality family relationships have lower alcohol consumption (variable "famrel" numeric: from 1 - very bad to 5 - excellent)
+Students that have larger study time consumes less alcohol (variable "studytime" numeric: 1 - <2 hours, 2 - 2 to 5 hours, 3 - 5 to 10 hours, or 4 - >10 hours)
+Students that have better health status have lower alcohol comsumption (variable "health" numeric: from 1 - very bad to 5 - very good)
+
+Let's observe these correlations with a tabulation and plots:
+
+
+```{r fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(ggpubr)
+
+# correlation tabulation from all the hypotheses
+
+corr <- ggcorr(alc[colnames(alc) %in% c("goout", "famrel", "studytime", "health", "alc_use")],
+       palette = "RdBu", label = TRUE, label_round=2)
+corr
+
+```
+
+```{r fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
+
+# correlation with high consumption of alcohol with box plots
+
+alc$high_use <- factor(alc$high_use, levels = c(TRUE, FALSE))
+
+df <- data.frame("high_use", "activities")
+
+
+g1 <- ggplot(alc, aes(x = high_use, y = goout, col = sex)) +
+  geom_boxplot()
+g2 <- ggplot(alc, aes(x = high_use, y = famrel, col = sex)) +
+  geom_boxplot()
+g3 <- ggplot(alc, aes(x = high_use, y = health, col = sex)) +
+  geom_boxplot()
+g4 <- ggplot(alc, aes(x = high_use, y = studytime, col = sex)) +
+  geom_boxplot()
+    
+  ggpubr::ggarrange(
+  plotlist = list(g1,g2,g3,g4), labels = "AUTO",
+  common.legend = T)
+```
+
+From the box plots it seems that the boys and girls who go out with friends have higher alcohol use. Surprisingly, health status does not seem to be related with high alcohol use. Going out more and poor family relationships both seem to be associated with high alcohol consumption more than not. The study time does not seem to be associates with high alcohol consumption.
+
+
+## logistic regression 
+
+Let's then explore the relationships between the variables with logistic regression:
+
+```{r fig.width=5, fig.height=4, message=FALSE, warning=FALSE}
+# find the model with glm()
+m <- glm(high_use ~ goout + famrel + health + studytime, data = alc, family = "binomial")
+
+summary(m)
+
+
+```
+According to the model going out, family relationships and studytime can predict the high alcohol use in this model as the p value is significant at least at the 0.001 level. Let's observe this further with odds ratios and confidence intervals:
+
+```{r fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
+# compute odds ratios (OR)
+OR <- coef(m) %>% exp
+
+# compute confidence intervals (CI)
+
+CI <- confint(m) %>%exp
+
+cbind(OR, CI)
+```
+
+
+Odds ratios essentially indicate the predictive strength of explanatory variables. A value greater than 1 suggests that the variable is indicative of lower usage, while a value smaller than 1 suggests an association with high usage. In the case of health the OR is in both sides if 1 withing its confidence intervals, which means that its a poor predictor for alcohol use. On the other hand, going out is a good predictor of high usage and studytime and family relationships are both over 1 which means its a good indicator of low usage. 
+
+## predictive power
+
+Lets observe how good this model is to predict low/high alcohol consumption:
+
+```{r fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
+
+library(dplyr)
+
+#prediction and observing the data
+prob <- predict(m, type = "response")
+alc <- mutate(alc, probability = prob)
+alc <- mutate(alc, prediction = probability > 0.5)
+select(alc, famrel, goout, studytime, high_use, probability, prediction) %>% tail(30)
+
+# how well the predictions were true
+
+table(high_use = alc$high_use, prediction = alc$prediction)
+table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table %>% addmargins
+
+# plotting the tale
+
+g <- ggplot(alc, aes(x = probability, y = high_use, col = prediction))
+
+g + geom_point()
+
+
+```
+
+It seems that the model is not very good at predicting alcohol use, as it tends to predict too much high alcohol use. Lets still do a cross validation:
+
+```{r fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
+library(boot)
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+# average of wrong predictions in the data
+
+cv <- cv.glm(data = alc, cost = loss_func, glmfit = m, K = nrow(alc))
+
+cv$delta[1]
+
+```
+Average of wrong predictions with these variables is 0.262... or  26 %. 
+
+we will continue next week again!
+
+
+

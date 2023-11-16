@@ -51,7 +51,7 @@ In the figure A you can see that in both male and female the points increase as 
 
 Then the regression model of the data:
 
-``````{r echo=TRUE, fig.height=3, fig.width=4, message=FALSE, warning=FALSE}
+```{r echo=TRUE, fig.height=3, fig.width=4, message=FALSE, warning=FALSE}
 
 library(GGally)
 library(ggplot2)
