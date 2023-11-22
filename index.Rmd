@@ -36,5 +36,16 @@ output:
 
 ***
 
-(more chapters to be added similarly as we proceed with the course!)
+```{r child = "Chapter3.Rmd"}
+```
+***
+
+```{r child = "Chapter4.Rmd"}
+
+```
+
+
+
+
+(more chapters to be added as we proceed with the course!)
 

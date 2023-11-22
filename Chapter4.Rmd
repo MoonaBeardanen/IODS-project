@@ -1,0 +1,26 @@
+---
+title: "Chapter4"
+output: html_document
+date: "2023-11-22"
+---
+
+# Clustering and classification
+
+This week we are practising with a Boston data from the MASS package. First lets load the data and observe the structure and dimensions of it:
+
+```{r  fig.width=5, fig.height=4, message=FALSE, warning=FALSE}
+
+# accessing the data
+
+library(MASS)
+data("boston")
+
+# structure and dimensions
+str(Boston)
+dim(Boston)
+
+
+```
+
+
+The data describes housing values in suburbs of boston and it has 506 observations and 14 variables. The meanings of each individual variable can be found through this link: https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html.

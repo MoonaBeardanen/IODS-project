@@ -7,7 +7,7 @@
 
         <meta name="author" content="Moona Partanen" />
     
-        <meta name="date" content="2023-11-16" />
+        <meta name="date" content="2023-11-22" />
     
     <title>IODS course project</title>
 
@@ -1592,8 +1592,7 @@ margin-left: 0 !important;
       to Open Data Science - Course Project</a></li>
       <li><a href="#about-the-project" id="toc-about-the-project">About
       the project</a></li>
-      <li><a href="#start-me-up" id="toc-start-me-up">1: Start me
-      up!</a>
+      <li><a href="#start-me-up" id="toc-start-me-up">Start me up!</a>
       <ul>
       <li><a href="#r-for-health-data-science-book" id="toc-r-for-health-data-science-book">R for health data science
       book</a></li>
@@ -1611,12 +1610,14 @@ margin-left: 0 !important;
       <li><a href="#logistic-regression-1" id="toc-logistic-regression-1">logistic regression</a></li>
       <li><a href="#predictive-power" id="toc-predictive-power">predictive power</a></li>
       </ul></li>
+      <li><a href="#clustering-and-classification" id="toc-clustering-and-classification">Clustering and
+      classification</a></li>
       </ul>
     </div>
     <div id="postamble" data-toggle="wy-nav-shift" class="status">
                   <p class="author"><span class="glyphicon glyphicon-user"></span> Moona
 Partanen</p>
-                        <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2023-11-16</p>
+                        <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2023-11-22</p>
           </div>
    </div>
      
@@ -1640,7 +1641,7 @@ get.</p>
 <p>Link to my GitHub repository: <a href="https://github.com/Moonabeardanen/IODS-project" class="uri">https://github.com/Moonabeardanen/IODS-project</a></p>
 </div>
 <div id="start-me-up" class="section level1">
-<h1>1: Start me up!</h1>
+<h1>Start me up!</h1>
 <div id="r-for-health-data-science-book" class="section level2">
 <h2>R for health data science book</h2>
 <div id="the-exercise-set-1" class="section level3">
@@ -2026,8 +2027,41 @@ validation:</p>
 %.</p>
 <p>we will continue next week again!</p>
 <hr />
-<p>(more chapters to be added as we proceed with the course!)</p>
 </div>
+</div>
+<div id="clustering-and-classification" class="section level1">
+<h1>Clustering and classification</h1>
+<p>This week we are practising with a Boston data from the MASS package.
+First lets load the data and observe the structure and dimensions of
+it:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="co"># accessing the data</span></span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;boston&quot;</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a><span class="co"># structure and dimensions</span></span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a><span class="fu">str</span>(Boston)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    506 obs. of  14 variables:
+##  $ crim   : num  0.00632 0.02731 0.02729 0.03237 0.06905 ...
+##  $ zn     : num  18 0 0 0 0 0 12.5 12.5 12.5 12.5 ...
+##  $ indus  : num  2.31 7.07 7.07 2.18 2.18 2.18 7.87 7.87 7.87 7.87 ...
+##  $ chas   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ nox    : num  0.538 0.469 0.469 0.458 0.458 0.458 0.524 0.524 0.524 0.524 ...
+##  $ rm     : num  6.58 6.42 7.18 7 7.15 ...
+##  $ age    : num  65.2 78.9 61.1 45.8 54.2 58.7 66.6 96.1 100 85.9 ...
+##  $ dis    : num  4.09 4.97 4.97 6.06 6.06 ...
+##  $ rad    : int  1 2 2 3 3 3 5 5 5 5 ...
+##  $ tax    : num  296 242 242 222 222 222 311 311 311 311 ...
+##  $ ptratio: num  15.3 17.8 17.8 18.7 18.7 18.7 15.2 15.2 15.2 15.2 ...
+##  $ black  : num  397 397 393 395 397 ...
+##  $ lstat  : num  4.98 9.14 4.03 2.94 5.33 ...
+##  $ medv   : num  24 21.6 34.7 33.4 36.2 28.7 22.9 27.1 16.5 18.9 ...</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">dim</span>(Boston)</span></code></pre></div>
+<pre><code>## [1] 506  14</code></pre>
+<p>The data describes housing values in suburbs of boston and it has 506
+observations and 14 variables. The meanings of each individual variable
+can be found through this link: <a href="https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html" class="uri">https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html</a>.</p>
+<p>(more chapters to be added as we proceed with the course!)</p>
 </div>
 </div>
 
