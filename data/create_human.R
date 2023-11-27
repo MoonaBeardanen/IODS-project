@@ -82,4 +82,4 @@ dim(human)
 # saving the data
 
 write.csv(human, "data/human.csv")
->>>>>>> 81d36a03428906df9c435359b810329906e8f3c8
+
