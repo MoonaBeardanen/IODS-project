@@ -89,7 +89,7 @@ Variables such as "labo.FM" (Labor Force Female/Male Ratio) and "Parl.E" (Percen
 
 First let's load the tea data and observe it:
 
-```{r}
+```{r, warning = FALSE}
 tea <- read.csv("https://raw.githubusercontent.com/KimmoVehkalahti/Helsinki-Open-Data-Science/master/datasets/tea.csv", stringsAsFactors = TRUE)
 str(tea)
 dim(tea)
@@ -128,7 +128,7 @@ plot(mca,invisible=c("ind"), habillage = "quali", graph.type = "classic")
 
 The MCA explains 6 variables correlation to tea drinking. The whole data contains 300 observations. This 2 factorial model can explain combined almost 30 % of the data (14.23 % and 15.24 %). This is however not very much. The distance between two variables in the factor map describes the relationship between the variables. Let's play with some other plotting options:
 
-```{r}
+```{r, warning=FALSE}
 barplot(mca$var$contrib, beside = T, col = rainbow(6),
         legend.text = rownames(mca$var$contrib))
 
