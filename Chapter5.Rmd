@@ -1,0 +1,143 @@
+---
+title: "Chapter5"
+output: html_document
+date: "2023-12-04"
+---
+
+
+# Dimensionality reduction techniques
+
+First lets read and prepare the data. Data wrangling can also be found in the data folder:
+
+```{r, warning= FALSE}
+library(readr)
+human <- read_csv("https://raw.githubusercontent.com/KimmoVehkalahti/Helsinki-Open-Data-Science/master/datasets/human2.csv", show_col_types = FALSE)
+summary(human)
+
+```
+
+
+firsty, lets move the country names to row names and describe the results:
+
+```{r, warning= FALSE}
+
+# move the country names to rownames
+library(tibble)
+human_ <- column_to_rownames(human, "Country")
+
+
+# Check the structure of the data frame after conversion
+str(human_)
+
+# visualize the 'human_' variables
+library(GGally)
+pairs(human_)
+
+# Access corrplot
+library(corrplot)
+
+# compute the correlation matrix and visualize it with corrplot
+cor_matrix<-cor(human_) %>% round(digits = 2)
+cor_matrix
+corrplot(cor_matrix, method="circle", type="lower", cl.pos="b", tl.pos="d", tl.cex = 0.6)
+
+```
+
+It seems that there is strong positive correlation between life expectancy at birth (Life.exp) and expected years of schooling (Edu.exp) and Adolescent birth rate (Ado.Birth) and Maternal mortality ratio (Mat.Mor). There is also a strong negative correlation between life expectancy at birth (Life.exp) and Maternal mortality ratio (Mat.Mor) and expected years of schooling (Edu.exp) and maternal mortality ratio.
+
+
+Next lets do a principal component analysis (PCA) on the data:
+
+
+```{r, warning=FALSE}
+pca <- prcomp(human_, center = F, scale. = F)
+sum <- summary(pca)
+
+# biplot
+pca_names <- round(100*sum$importance[2,], digits = 2)
+biplot(pca, choices = 1:2, cex = c(0.6, 1), col = c("blue3", "red4"),
+       xlabs = c(1:nrow(human)), xlab = paste0("PC1 (", pca_names[1], "%)"),
+       ylab = paste0("PC2 (", pca_names[2], "%)"), sub = "GNI explains nearly all the variations" )
+
+```
+
+The variable GNI or Gross National Income per capita seems to explain all the variations in the data with this model. This is very weird, so lets try another approach by standardizing the data:
+
+
+```{r, warning=FALSE}
+
+pca <- prcomp(human_, center = T, scale. = T)
+sum <- summary(pca)
+pca_names <- round(100*sum$importance[2,], digits = 2)
+biplot(pca, choices = 1:2, cex = c(0.5, 1), col = c("blue", "red3"),
+       #xlabs = c(1:nrow(human)),
+       xlab = paste0("PC1 (", pca_names[1], "%)"),
+       ylab = paste0("PC2 (", pca_names[2], "%)"), sub = "The variables in red on the left and right side of the plot are causing the majority of the variation")
+```
+
+Now the PCA looks more realistic. Now this is due to the mathematic formula the PCA follows. Standardizing the data for PCA ensures that all variables have the same scale, preventing variables with larger magnitudes from dominating the analysis, as seen in the first PCA. PCA is sensitive to the relative magnitudes of variables. Non-standardized data, may lead to biased results, as variables with larger scales could disproportionately influence the principal components. Standardization allows PCA to focus on the underlying patterns in the data, promoting a more equitable representation of each variable in the analysis.
+
+
+The second PCA presented here accounts for 69% of the data's variation, a substantial figure. PC1 contributes to 54% of this variation, demonstrating an inverse association with education and life expectancy while showing a direct link with maternal mortality and adolescent birth rate. Interestingly, these associations can be counter intuitive, as higher education levels often correlate with lower maternal mortality rates.
+
+PC2, responsible for explaining 16% of the variation, is positively associated with female participation in society, encompassing the labor force and the percentage of females in parliament. A high PC2 value for a country suggests that females significantly influence society within that context.
+
+Variables such as "labo.FM" (Labor Force Female/Male Ratio) and "Parl.E" (Percentage of Female Representatives in Parliament) play roles in illustrating these associations. In summary, the second PC sheds light on the impact of females on society through both their involvement in the workforce and political representation.
+
+## The tea data explorations
+
+
+First let's load the tea data and observe it:
+
+```{r}
+tea <- read.csv("https://raw.githubusercontent.com/KimmoVehkalahti/Helsinki-Open-Data-Science/master/datasets/tea.csv", stringsAsFactors = TRUE)
+str(tea)
+dim(tea)
+view(tea)
+```
+Then lets make this more easier to handle:
+
+```{r, warning=FALSE}
+
+# needed packages
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# visualising only certain columns
+
+keep_columns <- c("Tea", "How", "how", "sugar", "where", "lunch")
+tea_time <- dplyr::select(tea, keep_columns)
+dim(tea_time)
+
+
+pivot_longer(tea_time, cols = everything()) %>% 
+  ggplot(aes(value)) + facet_wrap("name", scales = "free") + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+
+```
+Now let's do multiple correspondence analysis (MCA) of the data:
+
+```{r, warning=FALSE}
+library(FactoMineR)
+mca <- MCA(tea_time, graph = FALSE)
+summary(mca)
+
+plot(mca,invisible=c("ind"), habillage = "quali", graph.type = "classic")
+```
+
+The MCA explains 6 variables correlation to tea drinking. The whole data contains 300 observations. This 2 factorial model can explain combined almost 30 % of the data (14.23 % and 15.24 %). This is however not very much. The distance between two variables in the factor map describes the relationship between the variables. Let's play with some other plotting options:
+
+```{r}
+barplot(mca$var$contrib, beside = T, col = rainbow(6),
+        legend.text = rownames(mca$var$contrib))
+
+library(factoextra)
+fviz_mca_ind(mca, geom.ind = "point", col.ind = "blue", 
+             palette = c("red", "green", "blue"), addEllipses = TRUE)
+fviz_mca_var(mca, geom.ind = "point", col.ind = "blue", 
+             palette = c("red", "green", "blue"), addEllipses = TRUE)
+```
+
+That was fun. Let's continue next week.
+
