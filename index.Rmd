@@ -50,6 +50,9 @@ output:
 
 ```
 
+```{r child = "Chapter6.Rmd"}
+
+```
 
 
 (more chapters to be added as we proceed with the course!)

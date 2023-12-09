@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Moona Partanen / 24.11.2023 / Assignment 4: data wrangling
 
 # reading the data

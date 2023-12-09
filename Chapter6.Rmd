@@ -1,0 +1,174 @@
+---
+title: "Chapter6"
+output: html_document
+date: "2023-12-08"
+---
+
+# Analysis of longitudal data
+
+## meet and repeat: PART I
+
+Lets first read the RATS data in to the environment and observe it:
+```{r}
+Rats <- read.csv("data//Rats_longitudinal.csv")
+RATS <- read.table("https://raw.githubusercontent.com/KimmoVehkalahti/MABS/master/Examples/data/rats.txt", header = TRUE, sep = '\t')
+glimpse(Rats)
+```
+Lets change the factorial variables to be just that:
+```{r}
+Rats$ID <- factor(Rats$ID)
+Rats$Group <- factor(Rats$Group)
+
+# lets observe the data
+glimpse(Rats)
+summary(Rats)
+colnames(Rats)
+```
+Now lets experiment with the data with some plots
+
+```{r, warning = FALSE}
+library(ggplot2)
+
+ggplot(Rats, aes(x = Time, y = rats, linetype = ID)) +
+  geom_line() +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ Group, labeller = label_both) +
+  theme(legend.position = "none") + 
+  scale_x_continuous(name = "Time", breaks = seq(0,60,10)) +
+  scale_y_continuous(name = "Rats weight")
+```
+
+This plot illustrates the weight of the rats by treatment groups. Immediately, we can see that Group 1 is lighter than group 2 or 3. Also, there is a quite noticeable outlier in group 2. 
+
+Lets standardize the data so that we can see the absolute differences better.
+```{r}
+library(dplyr); library(tidyr); library(ggplot2)
+
+# Standardize the variable rats
+Rats <- Rats %>%
+  group_by(Time) %>%
+  mutate(stdrats = (rats - mean(rats))/sd(rats) ) %>%
+  ungroup()
+
+# Glimpse the data
+glimpse(Rats)
+
+# Plot again with the standardized rats
+library(ggplot2)
+ggplot(Rats, aes(x = Time, y = stdrats, linetype = ID)) +
+  geom_line() +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ Group, labeller = label_both) +
+  scale_y_continuous(name = "standardized rats")
+
+```
+
+The growing trend of the weights are now disappeared. Lets check the stardard error of the mean in rats weight and provide a graphical overview:
+```{r}
+# lets create summary data 
+n <- Rats$Time %>% unique() %>% length()
+Ratss <- Rats %>%
+  group_by(Time, Group) %>%
+  summarise( mean = mean(rats), se = sd(rats)/sqrt(n) ) %>%
+  ungroup()
+glimpse(Ratss)
+
+ggplot(Ratss, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
+  geom_line() +
+  scale_linetype_manual(values = c(1,2,3)) +
+  geom_point(size=2) +
+  scale_shape_manual(values = c(1,2,3)) +
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se, linetype="1"), width=0.3) +
+  theme(legend.position = c(0.9,0.4)) +
+  scale_x_continuous(name = "Time", breaks = seq(0, 60, 10)) +
+  scale_y_continuous(name = "mean weight of the rats +/- error")
+```
+We can with this see clearly that the groups 2 and 3 have significantly higher weight. However as we remenber, we had a significant abnormal weight observations in the group 2. Lets find the outlier:
+
+```{r, warning=FALSE}
+Ratssum <- Rats %>%
+  filter(Time > 0) %>%
+  group_by(Group, ID) %>%
+  summarise( mean=mean(rats) ) %>%
+  ungroup()
+
+glimpse(Ratssum)
+
+# Draw a boxplot of the mean versus Group
+library(ggplot2)
+ggplot(Ratssum, aes(x = Group, y = mean)) +
+  geom_boxplot() +
+  stat_summary(fun = "mean", geom = "point", shape=15, size=3, fill = "pink") +
+  scale_y_continuous(name = "mean rats weight in Time points 15-60")
+
+
+```
+One of the means in group 2 is much higher compared to others so it will be brutally dropped as an outlier.
+
+```{r, warning= FALSE}
+Ratssum1 <- Ratssum %>% filter(mean < 550)
+ggplot(Ratssum1, aes(x = Group, y = mean)) +
+  geom_boxplot() +
+  stat_summary(fun.y = "mean", geom = "point", shape=15, size=3, fill = "pink") +
+  scale_y_continuous(name = "Adjusted mean weight")
+```
+Now this is better. Lets then check the significance between the groups with linear regression analysis:
+
+```{r, warning=FALSE}
+library(dplyr)
+library(tidyr)
+
+# removing the outlier
+
+RATS1 <- RATS[c(-12),]
+
+# Add the baseline from the original data as a new variable to the summary data
+Ratssum1 <- Ratssum1 %>% mutate(baseline = RATS1$WD1)
+Ratssum <- Ratssum %>% mutate(baseline = RATS$WD1)
+
+# Fit the linear model with the mean as the response 
+fit <- lm(mean ~ baseline + Group, data = Ratssum1)
+fit1 <- lm(mean ~ baseline + Group, data = Ratssum)
+
+
+# Compute the analysis of variance table for the fitted model with anova()
+anova(fit)
+anova(fit1)
+
+```
+We can see from the anova results that there is significant differences between the means of the different groups (p = 0.0037). If the outlier would not have been removed, the significance would have been non significant at 0.05 alfa value. Therefore, its important to consider the outliers in the data prior to processing.
+
+## meet and repeat: PART II
+
+Lets read us the new pbrs data to be evaluated. This data represents 40 male subjects that were receiving different treatment for eight weeks during which they were rated on brief psychiatric rating scale (BPRS). It is used to evaluate the level of schizophrenia:
+
+```{r}
+Bprs <- read.csv("data//Bprsl_longitudinal.csv")
+summary(Bprs)
+colnames(Bprs)
+str(Bprs)
+
+```
+
+Lets change the factorial variables to be just that:
+
+```{r}
+Bprs$treatment <- factor(Bprs$treatment)
+Bprs$subject <- factor(Bprs$subject)
+
+str(Bprs)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
