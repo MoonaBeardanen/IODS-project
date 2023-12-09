@@ -4,7 +4,7 @@ output: html_document
 date: "2023-12-08"
 ---
 
-# Analysis of longitudal data
+# Analysis of longitudinal data
 
 ## meet and repeat: PART I
 
