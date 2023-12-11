@@ -159,8 +159,84 @@ Bprs$subject <- factor(Bprs$subject)
 str(Bprs)
 ```
 
+The data here that we are about to process needs to be in a longitudinal form. This is already done in the data wrangling part which you can find in the data folder file Meet_and_repeat.R in this repository. Therefore, we can jump right in to checking how the treatment has affected the bprs responses of the patients:
 
+```{r}
+# needed libraries
+library(dplyr)
+library(tidyr)
 
+# Plot the Bprs data
+library(ggplot2)
+ggplot(Bprs, aes(x = week, y = bprs, linetype = subject)) +
+  geom_line() +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ treatment, labeller = label_both) +
+  theme(legend.position = "none") + 
+  scale_y_continuous(limits = c(min(Bprs$bprs), max(Bprs$bprs)))
+```
+There is a lot of variation in the data. In the treatment 1, it looks as there would be a stronger decreasing trend rather than witth the treatment 2 group. It will be interesting to see the statistics here. Lets first do the linear mixed regression model:
+
+```{r}
+linear <- lm(bprs ~ week + treatment, data = Bprs)
+summary(linear)
+```
+
+This model assumes that the measures made are independent. As this is related data, so continous answers from the same participant over the weeks, we have to do the random intercept model:
+
+```{r, warning=FALSE}
+library(lme4)
+random <- lmer(bprs ~ week + treatment + (1 | subject), data = Bprs, REML = FALSE)
+summary(random)
+```
+The updated model produces more appropriate results; for instance, the standard error for the week is now reduced. However, the model does not exhibit an optimal fit. To achieve an even better fit for this type of real-life data, both random intercept and random slope components are employed:
+
+```{r}
+random2 <- lmer(bprs ~ week + treatment + (week | subject), data = Bprs, REML = FALSE)
+summary(random2)
+
+# Anova of both models
+
+anova(random, random2)
+```
+The p-value for the second model is lower, which indicates that its better at describing this model. We can still try one more approach:
+
+```{r, warning=FALSE}
+random3 <- lmer(bprs ~ week * treatment + (week | treatment), data = Bprs, REML = FALSE)
+summary(random3)
+anova(random2, random3)
+```
+The Anova results show that the Chi-square value for the third approach is 1 so this is not a good fit for our data. Therefore, lets continue with the second model and observe the differences between the model and the real data:
+
+```{r}
+
+p1 <- ggplot(Bprs, aes(x = week, y = bprs, linetype = subject)) +
+  geom_line() +
+  scale_x_continuous(name = "Weeks") +
+  scale_y_continuous(name = "Bprs") +
+  theme(legend.position = "none") +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ treatment, labeller = label_both)
+
+Fitted <- fitted(random2)
+Bprs <- Bprs %>% mutate(fitted = Fitted)
+
+p2 <- ggplot(Bprs, aes(x = week, y = Fitted, linetype = subject)) +
+  geom_line() +
+  scale_x_continuous(name = "Weeks") +
+  scale_y_continuous(name = "Fitted Bprs") +
+  theme(legend.position = "none") +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ treatment, labeller = label_both)
+
+ggpubr::ggarrange(
+  plotlist = list(p1, p2), labels = "AUTO",
+  common.legend = T)
+```
+
+The patterns observed in the lines mirror the changes seen in the actual data. This model is certainly an improvement over the initial one because it eliminates the randomness in slopes, ensuring that all lines are parallel. Additionally, the third model shows no significant change compared to this second one. It's crucial to bear in mind that this is a model, and achieving an exact fit is an unattainable goal.
+
+This is the end of course. Cheers!
 
 
 
